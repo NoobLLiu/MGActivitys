@@ -1,0 +1,27 @@
+name: MGActivitys
+version: 1.0.1
+main: cn.gmzc.mgactivitys.MGActivitysPlugin
+api-version: '1.21'
+authors: [Codex]
+description: MG成长值系统 - 玩家活动追踪、排行榜、成长商店
+depend: [GMZCSkinCache]
+softdepend: [floodgate, GMZCTitles, FakePlayerManager]
+commands:
+  acti:
+    description: 打开成长值控制面板(管理员)
+    usage: /acti [debug growth <玩家名> <成长值>]
+    permission: mgactivitys.admin
+  actirank:
+    description: 查看成长值排行榜
+    usage: /actirank
+  actishop:
+    description: 打开成长商店
+    usage: /actishop
+  mgactivity:
+    description: API数据导出接口 - KBBSToper等插件调用
+    usage: mgactivity <set|get|reset>growthmultiplier|experiencemultiplier|maxhp|addstreakbreak %PLAYER% [value]
+    permission: none
+permissions:
+  mgactivitys.admin:
+    description: 允许管理成长值系统并使用调试指令
+    default: op
