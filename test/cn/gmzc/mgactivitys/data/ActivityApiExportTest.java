@@ -52,6 +52,13 @@ public final class ActivityApiExportTest {
         double after = manager.getGrowthMultiplier("Miner");
         assert after == 1.0 : "growth multiplier should auto-reset to default next day, got " + after;
 
+        // 断签：KBBSToper 派发即按下降值即时扣减并持久化，不再由 MGActivity 自行跨天扣减。
+        manager.setGrowthValue("Bob", 100.0);
+        assert manager.addStreakBreak("Bob", 2) : "addStreakBreak should succeed";
+        assert manager.getPlayerData("Bob").getTotalActivity() == 98.0 : "streak break deducts immediately, got "
+            + manager.getPlayerData("Bob").getTotalActivity();
+        assert manager.getPlayerData("Bob").getDynamicActivity() == 98.0 : "dynamic activity also deducted";
+
         System.out.println("ActivityApiExportTest PASSED");
     }
 }

@@ -99,7 +99,10 @@ public class ActivityManager {
             return false;
         }
         ActivityData data = getPlayerData(resolvePlayerName(playerName));
-        data.setStreakBreakCount(data.getStreakBreakCount() + amount);
+        // KBBSToper 负责"每日下降"的算法与节奏，这里仅按派发值即时扣减并持久化，MGActivity 不自行排期跨天扣减。
+        data.setTotalActivity(floorActivity(data.getTotalActivity() - amount));
+        data.setDynamicActivity(floorActivity(data.getDynamicActivity() - amount));
+        data.setStreakBreakCount(data.getStreakBreakCount() + 1);
         dirty = true;
         save();
         return true;
@@ -170,21 +173,7 @@ public class ActivityManager {
             // 成长/经验倍率仅在当日由 KBBSToper 等来源生效，次日自动恢复为默认(1x)，不跨日叠加。
             playerData.setGrowthMultiplier(1.0);
             playerData.setExperienceMultiplier(1.0);
-            if (playerData.getStreakBreakCount() > 0) {
-                double totalActivity = playerData.getTotalActivity();
-                double dynamicActivity = playerData.getDynamicActivity();
-                totalActivity = Math.floor((totalActivity - 2.0) * 10) / 10.0;
-                dynamicActivity = Math.floor((dynamicActivity - 2.0) * 10) / 10.0;
-                if (totalActivity < 0.1) {
-                    totalActivity = 0;
-                }
-                if (dynamicActivity < 0.1) {
-                    dynamicActivity = 0;
-                }
-                playerData.setTotalActivity(totalActivity);
-                playerData.setDynamicActivity(dynamicActivity);
-                playerData.setStreakBreakCount(playerData.getStreakBreakCount() - 1);
-            } else if (configManager.isDailyDecayEnabled()) {
+            if (configManager.isDailyDecayEnabled()) {
                 int decayMode = configManager.getDailyDecayMode();
                 double decayAmount = configManager.getDailyDecayAmount();
 
@@ -216,6 +205,11 @@ public class ActivityManager {
         }
 
         return playerData;
+    }
+
+    private static double floorActivity(double value) {
+        double result = Math.floor(value * 10) / 10.0;
+        return result < 0.1 ? 0 : result;
     }
 
     public synchronized boolean addActivity(String playerName, String listenerType) {

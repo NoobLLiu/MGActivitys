@@ -17,7 +17,7 @@
 | 6 | `mgactivity resetexperiencemultiplier %PLAYER%` | 将经验倍率恢复默认 1x | name | 是 | 立即置为 1x |
 | 7 | `mgactivity setmaxhp %PLAYER% <数值>` | 设置玩家生命值上限 | name, 数值(整数) | 是 | 硬顶 50，基础下限 30；持久化，无重置命令 |
 | 8 | `mgactivity getmaxhp %PLAYER%` | 查询当前生命值上限 | name | 是 | 返回当前值（默认 30） |
-| 9 | `mgactivity addstreakbreak %PLAYER% <下降值>` | 记录一次"连续签到中断" | name, 下降值(整数>0) | 是 | 相关活跃度按每日 -2 扣减，详见下方说明 |
+| 9 | `mgactivity addstreakbreak %PLAYER% <下降值>` | 记录一次"连续签到中断" | name, 下降值(整数>0) | 是 | 收到即按 `<下降值>` 即时扣减相关活跃度并持久化；"每日下降"的算法与节奏由 KBBSToper 负责，MGActivity 不自行跨天扣减 |
 
 ---
 
@@ -36,9 +36,9 @@
 
 ### 3) 连续签到中断（Streak Break）
 - `<下降值>`：整数 `> 0`，示例 `2`。
-- **当前实现语义**：`addstreakbreak %PLAYER% <下降值>` 会把该玩家的"待扣减天数计数器" `streakBreakCount += <下降值>`。此后每次跨天，只要 `streakBreakCount > 0`，就对 `totalActivity` 与 `dynamicActivity` 各 **-2**（向下取整到 0.1，低于 0.1 归 0），并把 `streakBreakCount` **减 1**。
-- 因此 `addstreakbreak Steve 2` 表示 Steve 将连续 **2 天**每天被扣 2 点活跃度。
-- ⚠️ **需要确认**：需求原文为"按配置下降（如每日 -2）"，`<下降值>` 命名偏向"每日下降值"。当前实现把它当作"扣减天数"。若你期望 `2` 表示"每日下降 2、且仅代表一次断签"，请告知，我再把语义调整（当前版本未改动，避免影响既有逻辑）。
+- **责任边界（重要）**：`addstreakbreak` 的"每日下降/扣减"的算法与触发节奏由 **KBBSToper** 负责维护并派发；MGactivity 只负责在收到指令后把数值落库，**不做跨天扣减**，也不维护"待扣减天数"计数。
+- **当前实现语义**：`mgactivity addstreakbreak %PLAYER% <下降值>` 会立即对 `totalActivity` 与 `dynamicActivity` 各减去 `<下降值>`（向下取整到 0.1，低于 0.1 归 0），并把 `streakBreakCount` 加 1（记录断签事件）。因此 `addstreakbreak Steve 2` = 立刻把 Steve 的总/动态活跃度各扣 2 点。
+- 若 KBBSToper 想实现"每日下降 2"，由其自行按天派发 `addstreakbreak %PLAYER% 2` 即可；MGactivity 不会代为排期。
 
 ---
 
@@ -73,7 +73,7 @@ mgactivity addstreakbreak Steve 2
 - `resetgrowthmultiplier Steve` → `Reset growth multiplier for "Steve" to default`
 - `setmaxhp Steve 60` → `Set max hp for "Steve" to 50`（体现硬顶 50）
 - `getmaxhp Steve` → `50`
-- `addstreakbreak Steve 2` → `Recorded streak break for "Steve" (-2/day)`
+- `addstreakbreak Steve 2` → `Applied streak break for "Steve" (-2)`
 
 "参数错误/缺参"时统一回显 usage：
 ```
@@ -96,7 +96,7 @@ usage: mgactivity <set|get|reset>growthmultiplier|experiencemultiplier|maxhp|add
 | --- | --- | --- |
 | 命令注册 | `plugin.yml` → `commands.mgactivity`；`MGActivitysPlugin.onEnable()` → `regCommand("mgactivity", new ApiExportCommand(this))` | |
 | 命令解析/分发 | `src/cn/gmzc/mgactivitys/command/ApiExportCommand.java` | `onCommand` switch 覆盖 9 个接口 |
-| 状态读写/持久化 | `src/cn/gmzc/mgactivitys/data/ActivityManager.java` | `set/get/reset GrowthMultiplier`、`set/get ExperienceMultiplier`、`set/getMaxHp`、`addStreakBreak`、`resolvePlayerName`、`getPlayerData`（含次日恢复与断签扣减） |
+| 状态读写/持久化 | `src/cn/gmzc/mgactivitys/data/ActivityManager.java` | `set/get/reset GrowthMultiplier`、`set/get ExperienceMultiplier`、`set/getMaxHp`、`addStreakBreak`、`resolvePlayerName`、`getPlayerData`（含倍率次日恢复；断签仅"收到即扣减+记录"，不跨天） |
 | 数据模型 | `src/cn/gmzc/mgactivitys/model/ActivityData.java` | 倍率/生命/断签字段 |
 
 ### 关键实现片段
@@ -121,6 +121,6 @@ if (playerData.getLastActiveDate() == null || !playerData.getLastActiveDate().eq
 ## 六、附注 / 待办
 
 - 上述接口本次已在 **测试服 StarCity-test** 部署新版 `MGActivitys-1.0.0.jar` 并实测通过（含非叠加、取最高、reset、maxhp 硬顶、断签、持久化）。
+- ⚠️ 自本次起，**"每日下降/扣减"模块不再由 MGactivity 实现**（例如断签的跨天 -2、待扣减天数计数），统一由 KBBSToper 计算并派发；MGactivity 仅负责"收到即落库 + 持久化 + 暴露 get/set/reset 接口"。
 - ⚠️ 目前 `growthMultiplier` / `experienceMultiplier` / `maxHp` 由 MGactivity **持久化存储**。将其**施加到实际玩法**（如成长奖励按倍率缩放、进入服务器时应用最大生命值）属于另一项改动，本接口清单暂未包含；如需一并实现，请确认后我再补。
 - 需要在 KBBSToper 的 `reward.commands` 等节点把上述接口写成配置命令（`%PLAYER%` 占位符）才会在顶贴时被派发。
-
