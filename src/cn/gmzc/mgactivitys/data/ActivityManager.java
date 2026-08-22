@@ -167,6 +167,9 @@ public class ActivityManager {
         }
 
         if (playerData.getLastActiveDate() == null || !playerData.getLastActiveDate().equals(today)) {
+            // 成长/经验倍率仅在当日由 KBBSToper 等来源生效，次日自动恢复为默认(1x)，不跨日叠加。
+            playerData.setGrowthMultiplier(1.0);
+            playerData.setExperienceMultiplier(1.0);
             if (playerData.getStreakBreakCount() > 0) {
                 double totalActivity = playerData.getTotalActivity();
                 double dynamicActivity = playerData.getDynamicActivity();
