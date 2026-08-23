@@ -151,6 +151,6 @@ public class ApiExportCommand implements CommandExecutor {
         int value = (int) Math.round(Double.parseDouble(args[2]));
         String name = resolveName(args);
         boolean ok = plugin.getActivityManager().addStreakBreak(name, value);
-        sender.sendMessage(ok ? "Recorded streak break for " + Q + name + Q + " (-2/day)" : "Add streak break failed");
+        sender.sendMessage(ok ? "Applied streak break for " + Q + name + Q + " (-" + value + ")" : "Add streak break failed");
     }
 }

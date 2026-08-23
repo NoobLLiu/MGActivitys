@@ -4,6 +4,7 @@ import cn.gmzc.fakeplayermanager.api.FakePlayerIdentityService;
 import cn.gmzc.mgactivitys.command.ActiCommand;
 import cn.gmzc.mgactivitys.command.ActiRankCommand;
 import cn.gmzc.mgactivitys.command.ActiShopCommand;
+import cn.gmzc.mgactivitys.api.MGActivityApi;
 import cn.gmzc.mgactivitys.command.ApiExportCommand;
 import cn.gmzc.mgactivitys.data.ActivityManager;
 import cn.gmzc.mgactivitys.data.ConfigManager;
@@ -93,6 +94,9 @@ public class MGActivitysPlugin extends JavaPlugin implements Listener {
         getLogger().info("\u00a7a[\u6210\u957f\u503c\u63d2\u4ef6] \u7ba1\u7406\u5458\u4f7f\u7528 /acti \u6253\u5f00\u63a7\u5236\u9762\u677f");
         getLogger().info("\u00a7a[\u6210\u957f\u503c\u63d2\u4ef6] \u73a9\u5bb6\u4f7f\u7528 /actirank \u67e5\u770b\u6392\u884c\u699c");
         getLogger().info("\u00a7a[\u6210\u957f\u503c\u63d2\u4ef6] \u73a9\u5bb6\u4f7f\u7528 /actishop \u6253\u5f00\u6210\u957f\u5546\u5e97");
+
+        // Initialize API for KBBSToper integration
+        MGActivityApi.init(this);
     }
 
     @Override
@@ -262,3 +266,7 @@ public class MGActivitysPlugin extends JavaPlugin implements Listener {
         }
     }
 }
+
+
+
+
