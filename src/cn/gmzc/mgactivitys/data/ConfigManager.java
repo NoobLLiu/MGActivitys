@@ -127,6 +127,7 @@ public class ConfigManager {
         defaults.put("itemPickup", new ListenerConfig(false, 0.1, 90, "\u6361\u8d77\u7269\u54c1"));
         defaults.put("moveDistance", new ListenerConfig(true, 5, 150, "\u6bcf\u79fb\u52a8100\u683c"));
         defaults.put("sellItem", new ListenerConfig(true, 50, 300, "\u51fa\u552e\u7269\u54c1"));
+        defaults.put("api_direct", new ListenerConfig(true, 0, -1, "API\u76f4\u63a5\u589e\u52a0"));
         return defaults;
     }
 
@@ -198,3 +199,4 @@ public class ConfigManager {
         save();
     }
 }
+
