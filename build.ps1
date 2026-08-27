@@ -9,6 +9,7 @@ $javaHome = Join-Path $serverRoot 'runtime\jdk25\jdk-25.0.3'
 $buildRoot = Join-Path $projectRoot 'build'
 $pluginOut = Join-Path $buildRoot 'plugin-classes'
 $testOut = Join-Path $buildRoot 'test-classes'
+$stubOut = Join-Path $buildRoot 'stub-classes'
 $jarPath = Join-Path $buildRoot 'MGActivitys-1.0.0.jar'
 
 $paperApi = Join-Path $serverRoot 'libraries\io\papermc\paper\paper-api\1.21.11-R0.1-SNAPSHOT\paper-api-1.21.11-R0.1-SNAPSHOT.jar'
@@ -29,13 +30,25 @@ foreach ($dependency in @($titleJar, $skinCacheJar, $fakePlayerManagerJar)) {
 $baseClassPath = "$paperApi;$floodgateJar;$titleJar;$skinCacheJar;$fakePlayerManagerJar"
 
 $libraryJars = Get-ChildItem -LiteralPath (Join-Path $serverRoot 'libraries') -Recurse -Filter '*.jar' -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName }
-$compileClassPath = "$baseClassPath;$($libraryJars -join ';')"
+$compileClassPath = "$baseClassPath;$stubOut;$($libraryJars -join ';')"
 
-foreach ($path in @($pluginOut, $testOut)) {
+foreach ($path in @($pluginOut, $testOut, $stubOut)) {
     if (Test-Path -LiteralPath $path) {
         Remove-Item -LiteralPath $path -Recurse -Force
     }
     New-Item -ItemType Directory -Path $path | Out-Null
+}
+
+# compile-only stubs (e.g. integration interfaces provided by other plugins):
+# compiled to stub-classes for compile classpath only; never packaged into the
+# release jar (at runtime the interface is loaded from the providing plugin).
+$stubSrc = Join-Path $projectRoot 'compile-only'
+$stubSources = @(Get-ChildItem -LiteralPath $stubSrc -Recurse -Filter *.java -ErrorAction SilentlyContinue | ForEach-Object FullName)
+if ($stubSources.Count -gt 0) {
+    & (Join-Path $javaHome 'bin\javac.exe') -encoding UTF-8 -proc:none -d $stubOut $stubSources
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
 }
 
 $sources = Get-ChildItem -LiteralPath (Join-Path $projectRoot 'src') -Recurse -Filter *.java | ForEach-Object FullName

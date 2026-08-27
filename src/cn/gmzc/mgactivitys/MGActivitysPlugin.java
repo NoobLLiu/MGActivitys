@@ -5,6 +5,7 @@ import cn.gmzc.mgactivitys.command.ActiCommand;
 import cn.gmzc.mgactivitys.command.ActiRankCommand;
 import cn.gmzc.mgactivitys.command.ActiShopCommand;
 import cn.gmzc.mgactivitys.api.MGActivityApi;
+import cn.gmzc.mgactivitys.api.MGactivityApiService;
 import cn.gmzc.mgactivitys.command.ApiExportCommand;
 import cn.gmzc.mgactivitys.data.ActivityManager;
 import cn.gmzc.mgactivitys.data.ConfigManager;
@@ -97,10 +98,17 @@ public class MGActivitysPlugin extends JavaPlugin implements Listener {
 
         // Initialize API for KBBSToper integration
         MGActivityApi.init(this);
+
+        // KBBSToper 原生对接：KBBSToper 存在时向 ServicesManager 注册 MGactivityApi；
+        // 其未安装或版本过旧（jar 不含接口）时注册器内部安全回退，命令式对接不受影响。
+        if (Bukkit.getPluginManager().getPlugin("KBBSToper") != null) {
+            MGactivityApiService.register(this);
+        }
     }
 
     @Override
     public void onDisable() {
+        MGactivityApiService.unregister(this);
         if (activitySaveTask != null) {
             activitySaveTask.cancel();
             activitySaveTask = null;

@@ -1,11 +1,11 @@
 name: MGActivitys
-version: 1.0.1
+version: 1.0.2
 main: cn.gmzc.mgactivitys.MGActivitysPlugin
 api-version: '1.21'
 authors: [Codex]
 description: MG成长值系统 - 玩家活动追踪、排行榜、成长商店
 depend: [GMZCSkinCache]
-softdepend: [floodgate, GMZCTitles, FakePlayerManager]
+softdepend: [floodgate, GMZCTitles, FakePlayerManager, KBBSToper]
 commands:
   acti:
     description: 打开成长值控制面板(管理员)
