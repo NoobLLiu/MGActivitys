@@ -57,12 +57,23 @@ public final class MGactivityApiImplTest {
         api.addStreakBreak("Bob", 5);
         assert manager.getPlayerData("Bob").getStreakBreakCount() == 2 : "streak break count accumulates";
 
-        // 非法参数（空名/非正数/NaN）不得抛出异常，静默拒绝（void 契约）。
+        // 星光点：增量累加、立即生效，且必须实际到账（覆盖 default 空实现）。
+        api.addStarlightPoints("Steve", 300);
+        assert manager.getStarlightPoints("Steve") == 300L : "starlight points accrue, got "
+            + manager.getStarlightPoints("Steve");
+        api.addStarlightPoints("Steve", 150);
+        assert manager.getStarlightPoints("Steve") == 450L : "starlight points accumulate on repeat, got "
+            + manager.getStarlightPoints("Steve");
+
+        // 非法参数（空名/负值）不得抛异常，静默拒绝（void 契约）。
         api.setGrowthMultiplier(null, 1.0);
         api.setGrowthMultiplier("  ", Double.NaN);
         api.setExperienceMultiplier(null, 1.0);
         api.setMaxHp("", 40);
         api.addStreakBreak("Bob", -1);
+        api.addStarlightPoints(null, 10);
+        api.addStarlightPoints("Steve", -1);
+        assert manager.getStarlightPoints("Steve") == 450L : "invalid addStarlightPoints must not change";
         assert manager.getPlayerData("Bob").getTotalActivity() == 90.0 : "invalid addStreakBreak must not deduct";
 
         System.out.println("MGactivityApiImplTest PASSED");

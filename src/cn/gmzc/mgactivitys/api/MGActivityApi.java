@@ -153,8 +153,6 @@ public class MGActivityApi {
      * @return whether added successfully
      */
     public boolean addStarlightPoints(String playerName, long points) {
-        // Starlight points system not yet implemented
-        plugin.getLogger().warning("addStarlightPoints not yet implemented");
-        return false;
+        return activityManager.addStarlightPoints(playerName, points);
     }
 }

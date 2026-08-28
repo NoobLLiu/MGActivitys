@@ -43,8 +43,20 @@ public class ActivityListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
+        // 重启后进服 / 离线期间被设置上限的玩家：重新应用持久化的最大生命值。
+        applyMaxHp(player);
         if (plugin.getConfigManager().getListenerConfig("playerJoin").isEnabled()) {
             activityManager.addActivity(player.getName(), "playerJoin");
+        }
+    }
+
+    private void applyMaxHp(Player player) {
+        int maxHp = activityManager.getMaxHp(player.getName());
+        if (maxHp >= 30) {
+            player.setMaxHealth(maxHp);
+            if (player.getHealth() > maxHp) {
+                player.setHealth(maxHp);
+            }
         }
     }
 
@@ -176,6 +188,8 @@ public class ActivityListener implements Listener {
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
         Player player = e.getPlayer();
+        // 死亡重生后怪可能重置刷新最大生命，重新应用持久化上限。
+        applyMaxHp(player);
         if (plugin.getConfigManager().getListenerConfig("playerRespawn").isEnabled()) {
             activityManager.addActivity(player.getName(), "playerRespawn");
         }

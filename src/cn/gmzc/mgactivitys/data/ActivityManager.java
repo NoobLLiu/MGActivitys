@@ -4,6 +4,8 @@ import cn.gmzc.mgactivitys.model.ActivityData;
 import cn.gmzc.mgactivitys.model.ListenerConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
@@ -27,7 +29,7 @@ import java.util.function.Predicate;
 
 public class ActivityManager {
     public synchronized double getGrowthMultiplier(String playerName) {
-        return getPlayerData(playerName).getGrowthMultiplier();
+        return getPlayerData(resolvePlayerName(playerName)).getGrowthMultiplier();
     }
 
     public synchronized boolean setGrowthMultiplier(String playerName, double value) {
@@ -53,7 +55,7 @@ public class ActivityManager {
     }
 
     public synchronized double getExperienceMultiplier(String playerName) {
-        return getPlayerData(playerName).getExperienceMultiplier();
+        return getPlayerData(resolvePlayerName(playerName)).getExperienceMultiplier();
     }
 
     public synchronized boolean setExperienceMultiplier(String playerName, double value) {
@@ -79,18 +81,32 @@ public class ActivityManager {
     }
 
     public synchronized int getMaxHp(String playerName) {
-        return getPlayerData(playerName).getMaxHp();
+        return getPlayerData(resolvePlayerName(playerName)).getMaxHp();
     }
 
     public synchronized int setMaxHp(String playerName, int value) {
         if (playerName == null || playerName.isBlank()) {
             return -1;
         }
-        ActivityData data = getPlayerData(resolvePlayerName(playerName));
+        String resolved = resolvePlayerName(playerName);
+        ActivityData data = getPlayerData(resolved);
         int clamped = Math.max(30, Math.min(50, value));
         data.setMaxHp(clamped);
         dirty = true;
         save();
+        // 立即应用到在线玩家，保证玩家游戏内生命上限真实生效（不只落盘）。
+        // try/catch：兼容离线保存或纯单测（无运行中的 Bukkit Server）场景，此时仅持久化。
+        try {
+            Player p = Bukkit.getPlayerExact(resolved);
+            if (p != null) {
+                p.setMaxHealth(clamped);
+                if (p.getHealth() > clamped) {
+                    p.setHealth(clamped);
+                }
+            }
+        } catch (RuntimeException ex) {
+            logger.log(Level.FINE, "Unable to apply maxHp live for " + resolved, ex);
+        }
         return clamped;
     }
 
@@ -229,11 +245,19 @@ public class ActivityManager {
         }
 
         double multiplier = config.getMultiplier();
-        playerData.setTotalActivity(playerData.getTotalActivity() + multiplier);
-        playerData.setDynamicActivity(playerData.getDynamicActivity() + multiplier);
-        playerData.getTodayActivity().put(listenerType, currentValue + multiplier);
+        // 倍率放大：当日成长值倍率对所有成长值发放生效；经验值倍率对经验相关监听发放额外生效。
+        double growthMult = playerData.getGrowthMultiplier();
+        double expMult = isExperienceType(listenerType) ? playerData.getExperienceMultiplier() : 1.0;
+        double granted = multiplier * growthMult * expMult;
+        playerData.setTotalActivity(playerData.getTotalActivity() + granted);
+        playerData.setDynamicActivity(playerData.getDynamicActivity() + granted);
+        playerData.getTodayActivity().put(listenerType, currentValue + granted);
         dirty = true;
         return true;
+    }
+
+    private static boolean isExperienceType(String listenerType) {
+        return "experienceGained".equals(listenerType) || "levelUp".equals(listenerType);
     }
 
     public synchronized String resolvePlayerName(String requestedName) {
@@ -256,6 +280,35 @@ public class ActivityManager {
         ActivityData playerData = getPlayerData(resolvePlayerName(playerName));
         playerData.setTotalActivity(value);
         playerData.setDynamicActivity(value);
+        dirty = true;
+        save();
+        return true;
+    }
+
+    public synchronized boolean addGrowthPoints(String playerName, double value) {
+        if (playerName == null || playerName.isBlank() || !Double.isFinite(value) || value < 0) {
+            return false;
+        }
+
+        // addgrowthpoints 为"直接累加"，而非覆盖：KBBSToper 补发成长值时在此基础累加。
+        ActivityData playerData = getPlayerData(resolvePlayerName(playerName));
+        playerData.setTotalActivity(floorActivity(playerData.getTotalActivity() + value));
+        playerData.setDynamicActivity(floorActivity(playerData.getDynamicActivity() + value));
+        dirty = true;
+        save();
+        return true;
+    }
+
+    public synchronized long getStarlightPoints(String playerName) {
+        return getPlayerData(resolvePlayerName(playerName)).getStarlightPoints();
+    }
+
+    public synchronized boolean addStarlightPoints(String playerName, long value) {
+        if (playerName == null || playerName.isBlank() || value < 0) {
+            return false;
+        }
+        ActivityData playerData = getPlayerData(resolvePlayerName(playerName));
+        playerData.setStarlightPoints(playerData.getStarlightPoints() + value);
         dirty = true;
         save();
         return true;
