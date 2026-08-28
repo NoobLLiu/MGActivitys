@@ -8,6 +8,10 @@ public class ActivityData {
     private double experienceMultiplier = 1.0;
     private int maxHp = 30;
     private int streakBreakCount = 0;
+    private long starlightPoints = 0L;
+
+    public long getStarlightPoints() { return starlightPoints; }
+    public void setStarlightPoints(long v) { this.starlightPoints = v; }
 
     public double getGrowthMultiplier() { return growthMultiplier; }
     public void setGrowthMultiplier(double v) { this.growthMultiplier = v; }

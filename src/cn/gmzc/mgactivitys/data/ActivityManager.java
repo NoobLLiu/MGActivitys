@@ -299,6 +299,21 @@ public class ActivityManager {
         return true;
     }
 
+    public synchronized long getStarlightPoints(String playerName) {
+        return getPlayerData(resolvePlayerName(playerName)).getStarlightPoints();
+    }
+
+    public synchronized boolean addStarlightPoints(String playerName, long value) {
+        if (playerName == null || playerName.isBlank() || value < 0) {
+            return false;
+        }
+        ActivityData playerData = getPlayerData(resolvePlayerName(playerName));
+        playerData.setStarlightPoints(playerData.getStarlightPoints() + value);
+        dirty = true;
+        save();
+        return true;
+    }
+
     public synchronized List<Map.Entry<String, ActivityData>> getRankedPlayers() {
         return getRankedPlayers(ignored -> true);
     }

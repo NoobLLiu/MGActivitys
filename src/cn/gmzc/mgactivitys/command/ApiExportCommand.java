@@ -32,6 +32,7 @@ public class ApiExportCommand implements CommandExecutor {
             case "getmaxhp": handleGetMaxHp(sender, args); break;
             case "addstreakbreak": handleAddStreakBreak(sender, args); break;
             case "addgrowthpoints": handleAddGrowthPoints(sender, args); break;
+            case "addstarlightpoints": handleAddStarlightPoints(sender, args); break;
             default: printUsage(sender); break;
         }
         return true;
@@ -54,7 +55,7 @@ public class ApiExportCommand implements CommandExecutor {
     }
 
     private void printUsage(CommandSender sender) {
-        String usage = "usage: mgactivity <set|get|reset>growthmultiplier|experiencemultiplier|maxhp|addstreakbreak|addgrowthpoints %PLAYER% [value]";
+        String usage = "usage: mgactivity <set|get|reset>growthmultiplier|experiencemultiplier|maxhp|addstreakbreak|addgrowthpoints|addstarlightpoints %PLAYER% [value]";
         sender.sendMessage(usage);
     }
 
@@ -164,5 +165,22 @@ public class ApiExportCommand implements CommandExecutor {
         String name = resolveName(args);
         boolean ok = plugin.getActivityManager().addGrowthPoints(name, value);
         sender.sendMessage(ok ? "Added " + value + " growth points for " + Q + name + Q : "Add growth points failed");
+    }
+
+    private void handleAddStarlightPoints(CommandSender sender, String[] args) {
+        if (args.length < 3) {
+            printUsage(sender);
+            return;
+        }
+        long value;
+        try {
+            value = Long.parseLong(args[2]);
+        } catch (NumberFormatException e) {
+            printUsage(sender);
+            return;
+        }
+        String name = resolveName(args);
+        boolean ok = plugin.getActivityManager().addStarlightPoints(name, value);
+        sender.sendMessage(ok ? "Added " + value + " starlight points for " + Q + name + Q : "Add starlight points failed");
     }
 }
