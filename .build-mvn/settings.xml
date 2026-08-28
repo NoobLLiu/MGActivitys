@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0">
+  <proxies>
+    <proxy>
+      <id>sandbox-http</id>
+      <active>true</active>
+      <protocol>http</protocol>
+      <host>127.0.0.1</host>
+      <port>18080</port>
+      <nonProxyHosts>localhost|127.0.0.1|*.svc|*.cluster.local|::1</nonProxyHosts>
+    </proxy>
+  </proxies>
+  <mirrors>
+    <mirror>
+      <id>central-mirror</id>
+      <mirrorOf>central</mirrorOf>
+      <url>https://repo1.maven.org/maven2/</url>
+    </mirror>
+  </mirrors>
+</settings>

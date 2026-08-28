@@ -31,6 +31,7 @@ public class ApiExportCommand implements CommandExecutor {
             case "setmaxhp": handleSetMaxHp(sender, args); break;
             case "getmaxhp": handleGetMaxHp(sender, args); break;
             case "addstreakbreak": handleAddStreakBreak(sender, args); break;
+            case "addgrowthpoints": handleAddGrowthPoints(sender, args); break;
             default: printUsage(sender); break;
         }
         return true;
@@ -53,7 +54,7 @@ public class ApiExportCommand implements CommandExecutor {
     }
 
     private void printUsage(CommandSender sender) {
-        String usage = "usage: mgactivity <set|get|reset>growthmultiplier|experiencemultiplier|maxhp|addstreakbreak %PLAYER% [value]";
+        String usage = "usage: mgactivity <set|get|reset>growthmultiplier|experiencemultiplier|maxhp|addstreakbreak|addgrowthpoints %PLAYER% [value]";
         sender.sendMessage(usage);
     }
 
@@ -152,5 +153,16 @@ public class ApiExportCommand implements CommandExecutor {
         String name = resolveName(args);
         boolean ok = plugin.getActivityManager().addStreakBreak(name, value);
         sender.sendMessage(ok ? "Applied streak break for " + Q + name + Q + " (-" + value + ")" : "Add streak break failed");
+    }
+
+    private void handleAddGrowthPoints(CommandSender sender, String[] args) {
+        if (args.length < 3 || !parseDouble(args, 2)) {
+            printUsage(sender);
+            return;
+        }
+        double value = Double.parseDouble(args[2]);
+        String name = resolveName(args);
+        boolean ok = plugin.getActivityManager().addGrowthPoints(name, value);
+        sender.sendMessage(ok ? "Added " + value + " growth points for " + Q + name + Q : "Add growth points failed");
     }
 }
