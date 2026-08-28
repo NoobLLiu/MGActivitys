@@ -4,6 +4,7 @@ import cn.gmzc.fakeplayermanager.api.FakePlayerIdentityService;
 import cn.gmzc.mgactivitys.command.ActiCommand;
 import cn.gmzc.mgactivitys.command.ActiRankCommand;
 import cn.gmzc.mgactivitys.command.ActiShopCommand;
+import cn.gmzc.mgactivitys.command.ActiStatusCommand;
 import cn.gmzc.mgactivitys.api.MGActivityApi;
 import cn.gmzc.mgactivitys.api.MGactivityApiService;
 import cn.gmzc.mgactivitys.command.ApiExportCommand;
@@ -89,12 +90,14 @@ public class MGActivitysPlugin extends JavaPlugin implements Listener {
         regCommand("acti", new ActiCommand(this));
         regCommand("actirank", new ActiRankCommand(this));
         regCommand("actishop", new ActiShopCommand(this));
+        regCommand("actistatus", new ActiStatusCommand(this));
         regCommand("mgactivity", new ApiExportCommand(this));
 
         getLogger().info("\u00a7a[\u6210\u957f\u503c\u63d2\u4ef6] \u5df2\u52a0\u8f7d\uff01\u7248\u672c 1.0.0");
         getLogger().info("\u00a7a[\u6210\u957f\u503c\u63d2\u4ef6] \u7ba1\u7406\u5458\u4f7f\u7528 /acti \u6253\u5f00\u63a7\u5236\u9762\u677f");
         getLogger().info("\u00a7a[\u6210\u957f\u503c\u63d2\u4ef6] \u73a9\u5bb6\u4f7f\u7528 /actirank \u67e5\u770b\u6392\u884c\u699c");
         getLogger().info("\u00a7a[\u6210\u957f\u503c\u63d2\u4ef6] \u73a9\u5bb6\u4f7f\u7528 /actishop \u6253\u5f00\u6210\u957f\u5546\u5e97");
+        getLogger().info("\u00a7a[\u6210\u957f\u503c\u63d2\u4ef6] \u73a9\u5bb6\u4f7f\u7528 /actistatus \u67e5\u770b\u6210\u957f\u72b6\u6001\u4e0e\u5956\u52b1\u6c47\u62a5");
 
         // Initialize API for KBBSToper integration
         MGActivityApi.init(this);

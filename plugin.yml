@@ -17,6 +17,9 @@ commands:
   actishop:
     description: 打开成长商店
     usage: /actishop
+  actistatus:
+    description: 查看自己的成长状态与KBBSToper奖励汇报
+    usage: /actistatus
   mgactivity:
     description: API数据导出接口 - KBBSToper等插件调用
     usage: mgactivity <set|get|reset>growthmultiplier|experiencemultiplier|maxhp|addstreakbreak %PLAYER% [value]
