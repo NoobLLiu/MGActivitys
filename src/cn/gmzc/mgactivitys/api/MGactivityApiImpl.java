@@ -55,4 +55,11 @@ public class MGactivityApiImpl implements MGactivityApi {
             logger.warning("[MGactivityApi] addStreakBreak rejected: player=" + player + ", value=" + value);
         }
     }
+
+    @Override
+    public void addStarlightPoints(String player, long value) {
+        if (!activityManager.addStarlightPoints(player, value)) {
+            logger.warning("[MGactivityApi] addStarlightPoints rejected: player=" + player + ", value=" + value);
+        }
+    }
 }

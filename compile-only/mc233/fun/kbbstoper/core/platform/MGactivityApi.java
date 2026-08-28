@@ -23,4 +23,13 @@ public interface MGactivityApi {
 
     /** 增加玩家连签中断计数（增量累加，立即生效）。 */
     void addStreakBreak(String player, int value);
+
+    /**
+     * 增加玩家星光点（增量累加、立即生效、value 非负）。
+     *
+     * <p>默认空实现：仅用于兼容旧版 KBBSToper（运行时未覆写时星光点不会到账，
+     * 但不会报错）。MGActivitys 实现类需覆写本方法以真实累加并持久化。</p>
+     */
+    default void addStarlightPoints(String player, long value) {
+    }
 }
