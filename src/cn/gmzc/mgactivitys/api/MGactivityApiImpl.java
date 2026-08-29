@@ -75,6 +75,10 @@ public class MGactivityApiImpl implements MGactivityApi {
         if (player == null || player.isBlank()) {
             return -1;
         }
-        return activityManager.getPlayerData(activityManager.resolvePlayerName(player)).getTotalActivity();
+        String resolved = activityManager.resolvePlayerName(player);
+        if (!activityManager.getPlayersData().containsKey(resolved)) {
+            return -1;
+        }
+        return activityManager.getPlayerData(resolved).getTotalActivity();
     }
 }

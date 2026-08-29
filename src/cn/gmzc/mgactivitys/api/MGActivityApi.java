@@ -147,7 +147,11 @@ public class MGActivityApi {
         if (playerName == null || playerName.isBlank()) {
             return -1;
         }
-        return activityManager.getPlayerData(activityManager.resolvePlayerName(playerName)).getTotalActivity();
+        String resolved = activityManager.resolvePlayerName(playerName);
+        if (!activityManager.getPlayersData().containsKey(resolved)) {
+            return -1;
+        }
+        return activityManager.getPlayerData(resolved).getTotalActivity();
     }
     
     /**
