@@ -90,7 +90,7 @@ public class ActivityManager {
         }
         String resolved = resolvePlayerName(playerName);
         ActivityData data = getPlayerData(resolved);
-        int clamped = Math.max(30, Math.min(50, value));
+        int clamped = Math.max(20, Math.min(50, value));
         data.setMaxHp(clamped);
         dirty = true;
         save();

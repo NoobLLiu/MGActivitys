@@ -6,7 +6,7 @@ import java.util.Map;
 public class ActivityData {
     private double growthMultiplier = 1.0;
     private double experienceMultiplier = 1.0;
-    private int maxHp = 30;
+    private int maxHp = 20;
     private int streakBreakCount = 0;
     private long starlightPoints = 0L;
 

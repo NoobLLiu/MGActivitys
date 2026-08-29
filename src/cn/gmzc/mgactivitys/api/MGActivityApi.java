@@ -98,7 +98,7 @@ public class MGActivityApi {
     /**
      * Set player's max HP
      * @param playerName player game name
-     * @param maxHp max HP (hard cap 50, base floor 30)
+     * @param maxHp max HP (hard cap 50, base floor 20)
      * @return actual value set (after clamp)
      */
     public int setMaxHp(String playerName, int maxHp) {
@@ -108,7 +108,7 @@ public class MGActivityApi {
     /**
      * Get player's current max HP
      * @param playerName player game name
-     * @return current max HP (default 30)
+     * @return current max HP (default 20)
      */
     public int getMaxHp(String playerName) {
         return activityManager.getMaxHp(playerName);
@@ -126,24 +126,28 @@ public class MGActivityApi {
         return activityManager.addStreakBreak(playerName, breakCount);
     }
     
-    // ===== Growth points / Starlight points interface (optional) =====
+    // ===== Growth points / Starlight points interface =====
     
     /**
-     * Add growth points for player
+     * Add growth points for player (accumulates to the same data read by /actistatus)
      * @param playerName player game name
      * @param points growth points amount
      * @return whether added successfully
      */
     public boolean addGrowthPoints(String playerName, double points) {
-        if (playerName == null || playerName.isBlank() || !Double.isFinite(points) || points <= 0) {
-            return false;
+        return activityManager.addGrowthPoints(playerName, points);
+    }
+    
+    /**
+     * Get player's current growth value (totalActivity)
+     * @param playerName player game name
+     * @return current growth value, or -1 if player not found
+     */
+    public double getGrowthValue(String playerName) {
+        if (playerName == null || playerName.isBlank()) {
+            return -1;
         }
-        // Directly add growth points
-        cn.gmzc.mgactivitys.model.ActivityData data = activityManager.getPlayerData(playerName);
-        data.setTotalActivity(data.getTotalActivity() + points);
-        data.setDynamicActivity(data.getDynamicActivity() + points);
-        activityManager.save();
-        return true;
+        return activityManager.getPlayerData(activityManager.resolvePlayerName(playerName)).getTotalActivity();
     }
     
     /**

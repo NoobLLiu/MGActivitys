@@ -52,7 +52,7 @@ public class ActivityListener implements Listener {
 
     private void applyMaxHp(Player player) {
         int maxHp = activityManager.getMaxHp(player.getName());
-        if (maxHp >= 30) {
+        if (maxHp >= 20) {
             player.setMaxHealth(maxHp);
             if (player.getHealth() > maxHp) {
                 player.setHealth(maxHp);

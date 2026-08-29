@@ -4,6 +4,7 @@ import cn.gmzc.fakeplayermanager.api.FakePlayerIdentityService;
 import cn.gmzc.mgactivitys.command.ActiCommand;
 import cn.gmzc.mgactivitys.command.ActiRankCommand;
 import cn.gmzc.mgactivitys.command.ActiShopCommand;
+import cn.gmzc.mgactivitys.command.ActiStatusCommand;
 import cn.gmzc.mgactivitys.api.MGActivityApi;
 import cn.gmzc.mgactivitys.api.MGactivityApiService;
 import cn.gmzc.mgactivitys.command.ApiExportCommand;
@@ -89,6 +90,7 @@ public class MGActivitysPlugin extends JavaPlugin implements Listener {
         regCommand("acti", new ActiCommand(this));
         regCommand("actirank", new ActiRankCommand(this));
         regCommand("actishop", new ActiShopCommand(this));
+        regCommand("actistatus", new ActiStatusCommand(this));
         regCommand("mgactivity", new ApiExportCommand(this));
 
         getLogger().info("\u00a7a[\u6210\u957f\u503c\u63d2\u4ef6] \u5df2\u52a0\u8f7d\uff01\u7248\u672c 1.0.0");
