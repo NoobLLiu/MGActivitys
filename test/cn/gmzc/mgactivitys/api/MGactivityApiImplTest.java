@@ -40,11 +40,16 @@ public final class MGactivityApiImplTest {
         assert manager.getExperienceMultiplier("Alex") == 2.0 : "experience multiplier should take max, got "
             + manager.getExperienceMultiplier("Alex");
 
-        // 生命值上限：绝对值写入，防御性钳制 [30, 50]，跨天保留（不在每日清零范围内）。
+        // 生命值上限：绝对值写入，KBBSToper A6 起下发 [20,50] 绝对值、不再设 30 下限；
+        // 非正回落 20，正数钳制 [1,50]；跨天保留（不在每日清零范围内）。
         api.setMaxHp("Steve", 999);
         assert manager.getMaxHp("Steve") == 50 : "maxhp hard cap at 50, got " + manager.getMaxHp("Steve");
+        api.setMaxHp("Steve", 20);
+        assert manager.getMaxHp("Steve") == 20 : "maxhp keeps 20 without floor raise, got " + manager.getMaxHp("Steve");
+        api.setMaxHp("Steve", 0);
+        assert manager.getMaxHp("Steve") == 20 : "maxhp non-positive falls back to 20, got " + manager.getMaxHp("Steve");
         api.setMaxHp("Steve", 1);
-        assert manager.getMaxHp("Steve") == 30 : "maxhp floor at 30, got " + manager.getMaxHp("Steve");
+        assert manager.getMaxHp("Steve") == 1 : "maxhp positive 1 hard-clamped to [1,50], got " + manager.getMaxHp("Steve");
         api.setMaxHp("Steve", 40);
         assert manager.getMaxHp("Steve") == 40 : "maxhp accepts 40";
 

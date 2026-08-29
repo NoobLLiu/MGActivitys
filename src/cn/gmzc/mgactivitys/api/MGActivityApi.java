@@ -98,7 +98,7 @@ public class MGActivityApi {
     /**
      * Set player's max HP
      * @param playerName player game name
-     * @param maxHp max HP (hard cap 50, base floor 30)
+     * @param maxHp max HP absolute value from KBBSToper (range [20,50], hp-base=20 / hp-hard-cap=50); non-positive falls back to 20, hard safety clamp [1,50]
      * @return actual value set (after clamp)
      */
     public int setMaxHp(String playerName, int maxHp) {
@@ -108,7 +108,7 @@ public class MGActivityApi {
     /**
      * Get player's current max HP
      * @param playerName player game name
-     * @return current max HP (default 30)
+     * @return current max HP (default 20)
      */
     public int getMaxHp(String playerName) {
         return activityManager.getMaxHp(playerName);
