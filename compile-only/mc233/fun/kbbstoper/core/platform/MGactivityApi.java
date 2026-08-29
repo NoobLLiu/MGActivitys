@@ -18,11 +18,20 @@ public interface MGactivityApi {
     /** 设置玩家经验值倍率（取最大值，不叠加；每日自动归位基准值 1.0）。 */
     void setExperienceMultiplier(String player, double value);
 
-    /** 设置玩家生命值上限（绝对值写入并持久化，跨天保留；MGActivitys 防御性钳制 [30, 50]）。 */
+    /** 设置玩家生命值上限（绝对值写入并持久化，跨天保留；MGActivitys 防御性钳制 [20, 50]）。 */
     void setMaxHp(String player, int value);
 
     /** 增加玩家连签中断计数（增量累加，立即生效）。 */
     void addStreakBreak(String player, int value);
+
+    /** 增加玩家成长值（增量累加、立即生效、持久化到同一份 /actistatus 数据）。 */
+    default void addGrowthPoints(String player, double value) {
+    }
+
+    /** 回读玩家当前成长值（用于命令下发后校验）。默认返回 -1 表示未覆写。 */
+    default double getGrowthValue(String player) {
+        return -1;
+    }
 
     /**
      * 增加玩家星光点（增量累加、立即生效、value 非负）。

@@ -1,5 +1,5 @@
 name: MGActivitys
-version: 1.0.4
+version: 1.0.3
 main: cn.gmzc.mgactivitys.MGActivitysPlugin
 api-version: '1.21'
 authors: [Codex]
@@ -18,7 +18,7 @@ commands:
     description: 打开成长商店
     usage: /actishop
   actistatus:
-    description: 查看自己的成长状态与KBBSToper奖励汇报
+    description: 查看个人活动状态（成长值、倍率、生命上限等）
     usage: /actistatus
   mgactivity:
     description: API数据导出接口 - KBBSToper等插件调用

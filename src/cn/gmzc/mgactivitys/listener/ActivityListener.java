@@ -52,8 +52,7 @@ public class ActivityListener implements Listener {
 
     private void applyMaxHp(Player player) {
         int maxHp = activityManager.getMaxHp(player.getName());
-        // 默认/持久化值为 20（原版上限），任何合法存档值都应重应用；仅防 0/负数等异常值。
-        if (maxHp > 0) {
+        if (maxHp >= 20) {
             player.setMaxHealth(maxHp);
             if (player.getHealth() > maxHp) {
                 player.setHealth(maxHp);

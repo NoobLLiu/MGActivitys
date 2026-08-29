@@ -36,12 +36,10 @@ public final class ActivityApiExportTest {
         assert manager.resetExperienceMultiplier("Alex") : "reset should succeed";
         assert manager.getExperienceMultiplier("Alex") == 1.0 : "reset experience multiplier to default 1x";
 
-        // 生命值上限：KBBSToper A6 起下发 [20,50] 绝对值，不再抬到 30 下限；非正回落 20，正数钳制 [1,50]。
+        // 生命值上限：基础 20，硬顶 50。
         assert manager.setMaxHp("Steve", 60) == 50 : "maxhp hard cap at 50";
         assert manager.getMaxHp("Steve") == 50 : "getMaxHp should return cap 50";
-        assert manager.setMaxHp("Steve", 20) == 20 : "maxhp keeps 20 without floor raise";
-        assert manager.setMaxHp("Steve", 0) == 20 : "maxhp non-positive falls back to 20";
-        assert manager.setMaxHp("Steve", 10) == 10 : "maxhp positive value hard-clamped to [1,50]";
+        assert manager.setMaxHp("Steve", 10) == 20 : "maxhp floor at 20";
         assert manager.setMaxHp("Steve", 40) == 40 : "maxhp accepts 40";
 
         // 次日自动恢复默认倍率：把 lastActiveDate 手动改成其它日期以触发日切换。

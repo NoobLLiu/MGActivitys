@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  * 直接委托 {@link ActivityManager}：
  * <ul>
  *   <li>倍率：取最大值、不叠加，次日自动归位 1.0；</li>
- *   <li>生命值上限：绝对值写入、即时应用到游戏内属性、持久化、跨天保留；KBBSToper A6 起下发 [20,50] 绝对值，不再设 30 下限，仅做 [1,50] 硬保险（默认 20）；</li>
+ *   <li>生命值上限：绝对值写入、持久化、跨天保留，防御性钳制 [20, 50]；</li>
  *   <li>连签中断：按派发值即时扣减成长值并累加中断计数，立即生效。</li>
  * </ul>
  * 玩家名支持中文/特殊字符，按 {@code ActivityManager.resolvePlayerName} 解析。
@@ -61,5 +61,20 @@ public class MGactivityApiImpl implements MGactivityApi {
         if (!activityManager.addStarlightPoints(player, value)) {
             logger.warning("[MGactivityApi] addStarlightPoints rejected: player=" + player + ", value=" + value);
         }
+    }
+
+    @Override
+    public void addGrowthPoints(String player, double value) {
+        if (!activityManager.addGrowthPoints(player, value)) {
+            logger.warning("[MGactivityApi] addGrowthPoints rejected: player=" + player + ", value=" + value);
+        }
+    }
+
+    @Override
+    public double getGrowthValue(String player) {
+        if (player == null || player.isBlank()) {
+            return -1;
+        }
+        return activityManager.getPlayerData(activityManager.resolvePlayerName(player)).getTotalActivity();
     }
 }
