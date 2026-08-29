@@ -36,10 +36,10 @@ public final class ActivityApiExportTest {
         assert manager.resetExperienceMultiplier("Alex") : "reset should succeed";
         assert manager.getExperienceMultiplier("Alex") == 1.0 : "reset experience multiplier to default 1x";
 
-        // 生命值上限：基础 30，硬顶 50。
+        // 生命值上限：基础 20，硬顶 50。
         assert manager.setMaxHp("Steve", 60) == 50 : "maxhp hard cap at 50";
         assert manager.getMaxHp("Steve") == 50 : "getMaxHp should return cap 50";
-        assert manager.setMaxHp("Steve", 10) == 30 : "maxhp floor at 30";
+        assert manager.setMaxHp("Steve", 10) == 20 : "maxhp floor at 20";
         assert manager.setMaxHp("Steve", 40) == 40 : "maxhp accepts 40";
 
         // 次日自动恢复默认倍率：把 lastActiveDate 手动改成其它日期以触发日切换。

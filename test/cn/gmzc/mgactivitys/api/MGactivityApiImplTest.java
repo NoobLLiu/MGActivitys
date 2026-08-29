@@ -40,11 +40,11 @@ public final class MGactivityApiImplTest {
         assert manager.getExperienceMultiplier("Alex") == 2.0 : "experience multiplier should take max, got "
             + manager.getExperienceMultiplier("Alex");
 
-        // 生命值上限：绝对值写入，防御性钳制 [30, 50]，跨天保留（不在每日清零范围内）。
+        // 生命值上限：绝对值写入，防御性钳制 [20, 50]，跨天保留（不在每日清零范围内）。
         api.setMaxHp("Steve", 999);
         assert manager.getMaxHp("Steve") == 50 : "maxhp hard cap at 50, got " + manager.getMaxHp("Steve");
         api.setMaxHp("Steve", 1);
-        assert manager.getMaxHp("Steve") == 30 : "maxhp floor at 30, got " + manager.getMaxHp("Steve");
+        assert manager.getMaxHp("Steve") == 20 : "maxhp floor at 20, got " + manager.getMaxHp("Steve");
         api.setMaxHp("Steve", 40);
         assert manager.getMaxHp("Steve") == 40 : "maxhp accepts 40";
 
@@ -75,6 +75,18 @@ public final class MGactivityApiImplTest {
         api.addStarlightPoints("Steve", -1);
         assert manager.getStarlightPoints("Steve") == 450L : "invalid addStarlightPoints must not change";
         assert manager.getPlayerData("Bob").getTotalActivity() == 90.0 : "invalid addStreakBreak must not deduct";
+
+        // 增加成长值：累加到 /actistatus 读取的同一份数据，立即持久化。
+        manager.setGrowthValue("Carol", 50.0);
+        api.addGrowthPoints("Carol", 100.0);
+        assert manager.getPlayerData("Carol").getTotalActivity() == 150.0
+            : "addGrowthPoints accumulates, got " + manager.getPlayerData("Carol").getTotalActivity();
+        // getGrowthValue 回读一致性
+        double readBack = api.getGrowthValue("Carol");
+        assert readBack == 150.0 : "getGrowthValue returns real value after addGrowthPoints, got " + readBack;
+
+        // getGrowthValue 对未录入玩家返回 -1。
+        assert api.getGrowthValue("NonExistent") == -1 : "getGrowthValue returns -1 for unknown player";
 
         System.out.println("MGactivityApiImplTest PASSED");
     }
