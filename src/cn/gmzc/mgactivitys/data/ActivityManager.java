@@ -90,10 +90,7 @@ public class ActivityManager {
         }
         String resolved = resolvePlayerName(playerName);
         ActivityData data = getPlayerData(resolved);
-        // KBBSToper A6 起下发的已是 [20,50] 绝对值（hp-base=20 / hp-hard-cap=50），不再二次抬到下界 30；
-        // 仅对 0/负数等极端值做硬保险：非正回落 20，再钳制到 [1,50]。
-        int safe = value > 0 ? value : 20;
-        int clamped = Math.min(50, Math.max(1, safe));
+        int clamped = Math.max(20, Math.min(50, value));
         data.setMaxHp(clamped);
         dirty = true;
         save();

@@ -75,7 +75,7 @@ if (api != null) {
 |--------|----------|------|
 | 倍率不叠加 | ✅ | 同一玩家同一天多来源只取 Math.max，不累乘 |
 | 次日自动恢复 | ✅ | 成长/经验值倍率在 lastActiveDate 跨天时自动重置为 1.0 |
-| 生命值硬顶 | ✅ | clamp(30, 50, value)：低于30返回30，高于50返回50 |
+| 生命值硬顶 | ✅ | clamp(20, 50, value)：低于20返回20，高于50返回50 |
 | 断签即扣减 | ✅ | ddStreakBreak 收到后立即扣减 totalActivity 和 dynamicActivity，不跨天排队 |
 | 线程安全 | ✅ | 所有 API 方法均使用 synchronized，主线程调用 |
 | 参数校验 | ✅ | 非法参数（null、NaN、负数）静默返回 false/默认值，不抛异常 |
@@ -147,7 +147,7 @@ if (api != null) {
 | 次日重置 | 成长/经验值倍率自动恢复1.0x，生命上限保持 |
 | 倍率取最高 | 先设1.25x再设1.5x，最终为1.5x |
 | 断签扣减 | addstreakbreak 2 → totalActivity 和 dynamicActivity 立即减少 |
-| 生命值clamp | setmaxhp 60 → 实际设置50；setmaxhp 20 → 实际设置30 |
+| 生命值clamp | setmaxhp 60 → 实际设置50；setmaxhp 20 → 实际设置20；setmaxhp 10 → 实际设置20 |
 
 ---
 
