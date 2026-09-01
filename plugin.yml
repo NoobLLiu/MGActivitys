@@ -1,5 +1,5 @@
 name: MGActivitys
-version: 1.0.3
+version: 1.0.4
 main: cn.gmzc.mgactivitys.MGActivitysPlugin
 api-version: '1.21'
 authors: [Codex]

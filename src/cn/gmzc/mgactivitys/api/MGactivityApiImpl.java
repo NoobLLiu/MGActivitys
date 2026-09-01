@@ -2,6 +2,9 @@ package cn.gmzc.mgactivitys.api;
 
 import cn.gmzc.mgactivitys.data.ActivityManager;
 import mc233.fun.kbbstoper.core.platform.MGactivityApi;
+import org.bukkit.Bukkit;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Player;
 
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -46,6 +49,27 @@ public class MGactivityApiImpl implements MGactivityApi {
         int applied = activityManager.setMaxHp(player, value);
         if (applied < 0) {
             logger.warning("[MGactivityApi] setMaxHp rejected: player=" + player + ", value=" + value);
+            return;
+        }
+        // 立即应用到在线玩家（KBBSToper 上线/维度切换刷新时需要即时生效）
+        Player online = Bukkit.getPlayerExact(player);
+        if (online != null && online.isOnline()) {
+            applyMaxHealth(online, applied);
+        }
+    }
+
+    /** 把持久化的血量上限应用到玩家的 Minecraft 属性。 */
+    private void applyMaxHealth(Player player, int maxHp) {
+        try {
+            var attr = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+            if (attr != null) {
+                attr.setBaseValue(maxHp);
+            }
+            if (player.getHealth() > maxHp) {
+                player.setHealth(maxHp);
+            }
+        } catch (Exception e) {
+            logger.warning("[MGactivityApi] applyMaxHealth failed for " + player.getName() + ": " + e.getMessage());
         }
     }
 
